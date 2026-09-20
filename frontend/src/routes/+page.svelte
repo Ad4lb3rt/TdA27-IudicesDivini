@@ -14,7 +14,8 @@
 </script>
 
 <div>
-	<h1>School Buffet</h1>
+	<h1>Think different Academy</h1>
+	<h2>School Buffet</h2>
 
 	<ProductForm
 		initial={editingProduct}
