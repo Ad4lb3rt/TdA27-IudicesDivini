@@ -1,0 +1,40 @@
+# Live-reload override for local development.
+# Your source dirs are bind-mounted and dev servers run with file watching,
+# so edits appear immediately without rebuilding.
+#
+# Usage:
+#   docker compose -f compose.yaml -f compose.dev.yaml up --build
+#
+# Then open http://localhost (Caddy) — frontend HMR + backend auto-restart.
+# Production-like run (no watching) is still just: docker compose up --build
+name: tda-app
+
+services:
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      # Linux container binaries stay separate from your Mac's node_modules.
+      - web-node-modules:/app/node_modules
+    # Vite dev is forced to :3001 so the Caddy upstreams below keep working.
+
+  server:
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ./backend:/app
+      - server-node-modules:/app/node_modules
+    # DATABASE_URL / PORT come from compose.yaml + backend/.env unchanged.
+
+  caddy:
+    environment:
+      BACKEND_UPSTREAM: server:8080
+      FRONTEND_UPSTREAM: web:3001
+    # Caddy v2 proxies the Vite HMR websocket automatically.
+
+volumes:
+  web-node-modules:
+  server-node-modules:

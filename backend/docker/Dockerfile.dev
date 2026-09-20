@@ -1,0 +1,6 @@
+FROM oven/bun:1.4-alpine
+# Dev-only image: source is bind-mounted, deps install on container start.
+# Runs with --watch so backend restarts on every save.
+WORKDIR /app
+EXPOSE 8080
+CMD ["sh", "-c", "bun install && bun --watch src/index.ts"]

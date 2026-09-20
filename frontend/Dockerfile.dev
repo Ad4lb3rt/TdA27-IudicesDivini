@@ -1,0 +1,6 @@
+FROM node:22-alpine
+# Dev-only image: source is bind-mounted, deps install on container start
+# (anonymous volume keeps Linux binaries separate from your Mac's node_modules).
+WORKDIR /app
+EXPOSE 3001
+CMD ["sh", "-c", "npm install --no-audit --no-fund --package-lock=false && npm run dev -- --host 0.0.0.0 --port 3001"]
