@@ -1,12 +1,12 @@
 exposedPort: 80
 containers:
   - name: web
-    image: registry.tourde.cloud/<slug>/web
+    image: registry.tourde.cloud/iudicesdivini/web
     port: 3001
     env:
       PORT: "3001"
   - name: server
-    image: registry.tourde.cloud/<slug>/server
+    image: registry.tourde.cloud/iudicesdivini/server
     port: 8080
     env:
       DATABASE_URL: mysql://tda_user:strongPassword%3F@127.0.0.1:3306/product
@@ -19,7 +19,7 @@ containers:
       MYSQL_ROOT_PASSWORD: password
     port: 3306
   - name: caddy
-    image: registry.tourde.cloud/<slug>/caddy
+    image: registry.tourde.cloud/iudicesdivini/caddy
     port: 80
 build:
   - name: web
