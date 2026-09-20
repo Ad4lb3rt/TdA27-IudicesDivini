@@ -29,6 +29,8 @@ services:
     environment:
       MYSQL_DATABASE: product
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: tda_user
+      MYSQL_PASSWORD: strongPassword?
       DEFAULT_AUTHENTICATION_PLUGIN: caching_sha2_password
     volumes:
       - ./backend/docker/init.sql:/docker-entrypoint-initdb.d/init.sql
