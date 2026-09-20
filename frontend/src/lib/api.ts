@@ -1,6 +1,6 @@
 // Only called server-side (+page.server). On Tour de Cloud the containers share
 // localhost; in local compose (bridge network) BACKEND_URL points at the server service.
-const API_URL = process.env.BACKEND_URL ?? "http://localhost:8080/api";
+const API_URL = process.env.BACKEND_URL ?? "http://localhost:8080/api/v1";
 
 export interface Product {
   id?: number;
@@ -39,5 +39,10 @@ export async function deleteProduct(id: number, customFetch = fetch): Promise<vo
   const res = await customFetch(`${API_URL}/product/${id}`, {
     method: "DELETE",
   });
+  return res.json();
+}
+
+export async function getHealth(): Promise<Product[]> {
+  const res = await fetch(`${API_URL}/health`);
   return res.json();
 }

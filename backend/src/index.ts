@@ -27,11 +27,11 @@ for (let attempt = 1; ; attempt++) {
 const ProductBody = t.Object({ name: t.String(), cost: t.Integer() });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
-const app = new Elysia({ prefix: "/api/product" })
+const app = new Elysia({ prefix: "/api/v1" })
   .use(cors())
-  .get("/", () => sql<Product[]>`SELECT id, name, cost FROM product ORDER BY id`)
+  .get("/product", () => sql<Product[]>`SELECT id, name, cost FROM product ORDER BY id`)
   .post(
-    "/",
+    "/product",
     async ({ body }) => {
       const result = await sql`INSERT INTO product (name, cost) VALUES (${body.name}, ${body.cost})`;
       return { id: Number(result.lastInsertRowid), ...body };
@@ -39,7 +39,7 @@ const app = new Elysia({ prefix: "/api/product" })
     { body: ProductBody },
   )
   .put(
-    "/:id",
+    "product/:id",
     async ({ params: { id }, body, status }) => {
       const [product] = await sql<Product[]>`SELECT id FROM product WHERE id = ${id}`;
       if (!product) return status(404, { message: "Product does not exist" });
@@ -50,12 +50,17 @@ const app = new Elysia({ prefix: "/api/product" })
     { params: t.Object({ id: t.Numeric() }), body: ProductBody },
   )
   .delete(
-    "/:id",
+    "product/:id",
     async ({ params: { id } }) => {
       await sql`DELETE FROM product WHERE id = ${id}`;
       return { message: "Product was deleted permanently from DB." };
     },
     { params: t.Object({ id: t.Numeric() }) },
+  )
+  .get("/health",
+    () => ({
+      status: "ok"
+    })
   )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });
 
