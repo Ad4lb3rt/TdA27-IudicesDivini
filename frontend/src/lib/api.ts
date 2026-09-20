@@ -8,6 +8,13 @@ export interface Product {
   cost: number;
 }
 
+export async function getHealth(customFetch = fetch): Promise<string> {
+  const response = await customFetch(`${API_URL}/health`);
+ 	let status:string  = await response.json();
+ 	let statusData: Record<string, string>  = JSON.parse(status);
+ 	return statusData["status"];
+}
+
 export async function getProducts(customFetch = fetch): Promise<Product[]> {
   const res = await customFetch(`${API_URL}/product`);
   return res.json();
@@ -39,10 +46,5 @@ export async function deleteProduct(id: number, customFetch = fetch): Promise<vo
   const res = await customFetch(`${API_URL}/product/${id}`, {
     method: "DELETE",
   });
-  return res.json();
-}
-
-export async function getHealth(): Promise<Product[]> {
-  const res = await fetch(`${API_URL}/health`);
   return res.json();
 }

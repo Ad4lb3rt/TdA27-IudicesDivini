@@ -1,10 +1,12 @@
-import { getProducts, createProduct, updateProduct, deleteProduct } from '$lib/api';
+import { getProducts, createProduct, updateProduct, deleteProduct, getHealth } from '$lib/api';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ fetch }) => {
+  const status = await getHealth(fetch);
 	const products = await getProducts(fetch);
 	return {
-		products
+    products,
+    status
 	};
 };
 
