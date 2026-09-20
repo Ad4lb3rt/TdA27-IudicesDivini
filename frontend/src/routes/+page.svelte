@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { getHealth, type Product } from '$lib/api';
+	import { type Product } from '$lib/api';
 	import ProductForm from "$lib/ProductForm.svelte";
 	import ProductTable from "$lib/ProductTable.svelte";
 
@@ -14,11 +14,10 @@
 </script>
 
 <div>
-    <p>status: {data.products}</p>
-
+	
 	<h1>Think different Academy</h1>
 	<h2>School Buffet</h2>
-
+	
 	<ProductForm
 		initial={editingProduct}
 		onCancel={editingProduct ? () => (editingProduct = null) : undefined}
@@ -29,4 +28,5 @@
 		products={data.products}
 		onEdit={(p) => (editingProduct = p)}
 	/>
+	<br><p>Status: {(data.status).toUpperCase()}</p>
 </div>
