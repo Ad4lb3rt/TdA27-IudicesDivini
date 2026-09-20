@@ -1,5 +1,6 @@
-// Only called server-side (+page.server); the backend shares localhost in dev and on TdC.
-const API_URL = "http://localhost:8080/api";
+// Only called server-side (+page.server). On Tour de Cloud the containers share
+// localhost; in local compose (bridge network) BACKEND_URL points at the server service.
+const API_URL = process.env.BACKEND_URL ?? "http://localhost:8080/api";
 
 export interface Product {
   id?: number;
