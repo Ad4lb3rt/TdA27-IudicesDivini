@@ -15,7 +15,7 @@ containers:
     image: mysql
     tag: "8.4"
     env:
-      MYSQL_DATABASE: product
+      MYSQL_DATABASE: buffet
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: tda_user
       MYSQL_PASSWORD: strongPassword?
