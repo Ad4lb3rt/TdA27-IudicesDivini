@@ -22,14 +22,14 @@ CREATE TABLE IF NOT EXISTS team_members(
     name VARCHAR(100) NOT NULL
 );
 
-INSERT INTO team_name
+INSERT IGNORE INTO team_name
 (name)
 VALUES
-("IudicesDivini");
+('IudicesDivini');
 
-INSERT INTO team_members
+INSERT IGNORE INTO team_members
 (name)
 VALUES
-("Ad4lb3rt"),
-("vojtaiguess"),
-("Dxs7y");
+('Ad4lb3rt'),
+('vojtaiguess'),
+('Dxs7y');

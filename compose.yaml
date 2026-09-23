@@ -26,7 +26,7 @@ services:
       dockerfile: docker/Dockerfile
     env_file: ./backend/.env
     environment:
-      DATABASE_URL: mysql://tda_user:strongPassword%3F@mysql:3306/product
+      DATABASE_URL: mysql://tda_user:strongPassword%3F@mysql:3306/buffet
     ports:
       - "8080:8080"
     depends_on:

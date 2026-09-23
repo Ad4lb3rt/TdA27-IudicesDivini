@@ -21,7 +21,7 @@ services:
     restart: always
     network_mode: host
     environment:
-      MYSQL_DATABASE: product
+      MYSQL_DATABASE: buffet
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: tda_user
       MYSQL_PASSWORD: strongPassword?

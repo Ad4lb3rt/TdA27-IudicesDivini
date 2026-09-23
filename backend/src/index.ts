@@ -16,14 +16,6 @@ for (let attempt = 1; ; attempt++) {
       name VARCHAR(100) NOT NULL,
       cost INT NOT NULL
       )`;
-    await sql`CREATE TABLE IF NOT EXISTS team_name (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL
-      )`;
-    await sql`CREATE TABLE IF NOT EXISTS team_members (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL
-    )`;
     break;
   } catch (error) {
     if (attempt === 60) throw error;
