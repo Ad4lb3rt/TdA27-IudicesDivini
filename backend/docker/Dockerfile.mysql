@@ -1,0 +1,3 @@
+FROM mysql:8.4
+# Copy the script into the image, so it runs on first boot
+COPY init.sql /docker-entrypoint-initdb.d/

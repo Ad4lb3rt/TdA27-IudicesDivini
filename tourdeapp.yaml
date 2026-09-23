@@ -12,8 +12,7 @@ containers:
       DATABASE_URL: mysql://tda_user:strongPassword%3F@127.0.0.1:3306/buffet
       PORT: "8080"
   - name: mysql
-    image: mysql
-    tag: "8.4"
+    image: registry.tourde.cloud/iudicesdivini/mysql
     env:
       MYSQL_DATABASE: buffet
       MYSQL_ROOT_PASSWORD: password
@@ -32,6 +31,9 @@ build:
   - name: server
     context: ./backend
     dockerfile: ./backend/docker/Dockerfile
+  - name: mysql
+    context: ./backend/docker
+    dockerfile: ./backend/docker/Dockerfile.mysql
   - name: caddy
     context: ./caddy
     dockerfile: ./caddy/Dockerfile
