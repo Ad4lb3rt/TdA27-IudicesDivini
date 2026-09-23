@@ -3,15 +3,15 @@ import type { PageServerLoad, Actions } from './$types';
 import { type Product } from "$lib/api";
 
 export const load: PageServerLoad = async ({ fetch }) => {
-  const status: string = await api.getHealth(fetch);
-  const products: Product[] = await api.getProducts(fetch);
-  const teamName: string = await api.getTeamName(fetch);
-  const teamMembers: string[] = await api.getTeamMembers(fetch);
+	const status: string = await api.getHealth(fetch);
+	const products: Product[] = await api.getProducts(fetch);
+	const teamName: string = await api.getTeamName(fetch);
+	const teamMembers: string[] = await api.getTeamMembers(fetch);
 	return {
-    products,
-    status,
-    teamName,
-    teamMembers
+		products,
+		status,
+		teamName,
+		teamMembers
 	};
 };
 
