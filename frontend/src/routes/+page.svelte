@@ -14,10 +14,11 @@
 </script>
 
 <div>
-	
+
 	<h1>Think different Academy</h1>
+
 	<h2>School Buffet</h2>
-	
+
 	<ProductForm
 		initial={editingProduct}
 		onCancel={editingProduct ? () => (editingProduct = null) : undefined}
@@ -28,5 +29,6 @@
 		products={data.products}
 		onEdit={(p) => (editingProduct = p)}
 	/>
-	<br><p>Status: {(data.status).toUpperCase()}</p>
+
+	<p>Status: {(data.status).toUpperCase()}</p>
 </div>
