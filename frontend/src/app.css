@@ -5,18 +5,20 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Geist Sans', system-ui, -apple-system, sans-serif;
   padding: 32px;
   background: #111;
   color: #ccc;
   min-height: 100vh;
   max-width: 720px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
   margin-bottom: 24px;
-  color: #eee;
+  color: #ccc;
   font-weight: 600;
 }
 
@@ -94,6 +96,24 @@ button:hover {
 }
 
 p {
-  color: #555;
+  color: #676767;
   font-size: 14px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: calc(100vh - 64px);
+}
+
+.page main {
+  flex: 1;
+}
+
+footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }

@@ -1,12 +1,17 @@
-import { getProducts, createProduct, updateProduct, deleteProduct, getHealth } from '$lib/api';
+import * as api from '$lib/api';
 import type { PageServerLoad, Actions } from './$types';
+import { type Product } from "$lib/api";
 
 export const load: PageServerLoad = async ({ fetch }) => {
-  const status = await getHealth(fetch);
-	const products = await getProducts(fetch);
+  const status: string = await api.getHealth(fetch);
+  const products: Product[] = await api.getProducts(fetch);
+  const teamName: string = await api.getTeamName(fetch);
+  const teamMembers: string[] = await api.getTeamMembers(fetch);
 	return {
     products,
-    status
+    status,
+    teamName,
+    teamMembers
 	};
 };
 
@@ -18,7 +23,7 @@ export const actions: Actions = {
 
 		if (!name || isNaN(cost)) return { success: false, error: 'Invalid data' };
 
-		await createProduct({ name, cost }, fetch);
+		await api.createProduct({ name, cost }, fetch);
 		return { success: true };
 	},
 	update: async ({ request, fetch }) => {
@@ -29,7 +34,7 @@ export const actions: Actions = {
 
 		if (!id || !name || isNaN(cost)) return { success: false, error: 'Invalid data' };
 
-		await updateProduct(id, { id, name, cost }, fetch);
+		await api.updateProduct(id, { id, name, cost }, fetch);
 		return { success: true };
 	},
 	delete: async ({ request, fetch }) => {
@@ -38,7 +43,7 @@ export const actions: Actions = {
 
 		if (!id) return { success: false, error: 'Invalid ID' };
 
-		await deleteProduct(id, fetch);
+		await api.deleteProduct(id, fetch);
 		return { success: true };
 	}
 };
