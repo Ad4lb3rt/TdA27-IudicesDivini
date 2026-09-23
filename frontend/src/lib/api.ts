@@ -10,9 +10,23 @@ export interface Product {
 
 export async function getHealth(customFetch = fetch): Promise<string> {
   const response = await customFetch(`${API_URL}/health`);
- 	const statusData: { status: string } = await response.json();
-  console.log(statusData.status)
- 	return statusData.status;
+  const statusData: { status: string } = await response.json();
+  return statusData.status;
+}
+
+export async function getTeamName(customFetch = fetch): Promise<string> {
+  const response = await customFetch(`${API_URL}/team/name`);
+  let name: string = "";
+  await response.text().then((text: string) => {
+    name = text;
+  });
+  return name;
+}
+
+export async function getTeamMembers(customFetch = fetch): Promise<string[]> {
+  const response = await customFetch(`${API_URL}/team/members`);
+  const members: string[] = await response.json();
+  return members;
 }
 
 export async function getProducts(customFetch = fetch): Promise<Product[]> {

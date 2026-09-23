@@ -62,6 +62,23 @@ const app = new Elysia({ prefix: "/api/v1" })
       status: "ok"
     })
   )
+  .get("/team/name",
+    async ({ set }) => {
+      set.headers['Content-Type'] = "text/plain";
+
+      const teamNameQuery = await sql`SELECT id, name FROM team_name`;
+      return teamNameQuery[0]["name"];
+    }
+  )
+  .get("/team/members",
+    async () => {
+      const members = (await sql`SELECT id, name FROM team_members ORDER BY id`);
+      let memberNames: string[] = members.map((member: { id: number, name: string }) => {
+        return member.name;
+      })
+      return memberNames;
+    }
+  )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });
 
 console.log(`Server running on http://${app.server?.hostname}:${app.server?.port}`);
