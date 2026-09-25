@@ -22,6 +22,20 @@ CREATE TABLE IF NOT EXISTS team_members(
     name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS stops (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    image_url VARCHAR(255),
+    is_transfer BOOLEAN,
+    x FLOAT,
+    y FLOAT,
+    wheelchair_accessible BOOLEAN,
+    has_shelter BOOLEAN,
+    has_bench BOOLEAN,
+    has_ticket_machine BOOLEAN,
+    has_display BOOLEAN
+)
+
 INSERT IGNORE INTO team_name
 (name)
 VALUES
