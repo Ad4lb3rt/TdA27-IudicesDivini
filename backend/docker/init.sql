@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS stops (
     has_bench BOOLEAN,
     has_ticket_machine BOOLEAN,
     has_display BOOLEAN
-)
+);
 
 INSERT IGNORE INTO team_name
 (name)
