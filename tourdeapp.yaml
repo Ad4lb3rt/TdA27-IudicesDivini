@@ -9,12 +9,12 @@ containers:
     image: registry.tourde.cloud/iudicesdivini/server
     port: 8080
     env:
-      DATABASE_URL: mysql://tda_user:strongPassword%3F@127.0.0.1:3306/buffet
+      DATABASE_URL: mysql://tda_user:strongPassword%3F@127.0.0.1:3306/db
       PORT: "8080"
   - name: mysql
     image: registry.tourde.cloud/iudicesdivini/mysql
     env:
-      MYSQL_DATABASE: buffet
+      MYSQL_DATABASE: db
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: tda_user
       MYSQL_PASSWORD: strongPassword?
