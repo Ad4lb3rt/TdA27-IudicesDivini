@@ -26,7 +26,7 @@ services:
       dockerfile: docker/Dockerfile
     env_file: ./backend/.env
     environment:
-      DATABASE_URL: mysql://tda_user:strongPassword%3F@mysql:3306/buffet
+      DATABASE_URL: mysql://tda_user:strongPassword%3F@mysql:3306/db
     ports:
       - "8080:8080"
     depends_on:
@@ -36,7 +36,7 @@ services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: buffet
+      MYSQL_DATABASE: db
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: tda_user
       MYSQL_PASSWORD: strongPassword?
