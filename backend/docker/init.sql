@@ -49,7 +49,14 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY ''
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(name, is_transfer, x, y, wheelchair_accessible, has_shelter, has_bench, has_ticket_machine, has_display);
+(@dummy_id, name, @dummy_lines, @is_transfer, @dummy_transfer_lines, x, y, @wheelchair, @shelter, @bench, @ticket, @display, @dummy_image_url)
+SET 
+    is_transfer = (@is_transfer = 'true'),
+    wheelchair_accessible = (@wheelchair = 'true'),
+    has_shelter = (@shelter = 'true'),
+    has_bench = (@bench = 'true'),
+    has_ticket_machine = (@ticket = 'true'),
+    has_display = (@display = 'true');
 
 INSERT IGNORE INTO team_name
 (name)
