@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS stops (
         CONCAT('/images/',
             LOWER(SUBSTRING_INDEX(name, ' ', 1)),
             UPPER(LEFT(SUBSTRING_INDEX(name, ' ', -1), 1)),
-            SUBSTRING(SUBSTRING_INDEX(name, ' ', -1),2), '.png'
+            SUBSTRING(SUBSTRING_INDEX(name, ' ', -1),2)
         )
     ) STORED,
     UNIQUE(image_url),
