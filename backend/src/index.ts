@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 import { SQL } from "bun";
+import { promises as fs } from "fs";
 
 type Product = { id: number; name: string; cost: number };
 
@@ -77,6 +78,20 @@ const app = new Elysia({ prefix: "/api/v1" })
         return member.name;
       })
       return memberNames;
+    }
+  )
+  .get("/images/:name",
+    async ({ params: { name }, set }) => {
+      try {
+        const image = await fs.readFile(`./src/images/stops/${name}.png`);
+        set.headers["Content-Type"] = "image/png";
+        return image;
+      }
+      catch (err) {
+        console.error(err);
+        set.status = 404;
+        return "Image not found";
+      }
     }
   )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });

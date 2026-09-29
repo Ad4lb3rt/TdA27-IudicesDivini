@@ -25,7 +25,14 @@ CREATE TABLE IF NOT EXISTS team_members(
 CREATE TABLE IF NOT EXISTS stops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    image_url VARCHAR(255),
+    image_url VARCHAR(255) GENERATED ALWAYS AS (
+        CONCAT('/images/',
+            LOWER(SUBSTRING_INDEX(name, ' ', 1)),
+            UPPER(LEFT(SUBSTRING_INDEX(name, ' ', -1), 1)),
+            SUBSTRING(SUBSTRING_INDEX(name, ' ', -1),2), '.png'
+        )
+    ) STORED,
+    UNIQUE(image_url),
     is_transfer BOOLEAN,
     x FLOAT,
     y FLOAT,
@@ -35,6 +42,21 @@ CREATE TABLE IF NOT EXISTS stops (
     has_ticket_machine BOOLEAN,
     has_display BOOLEAN
 );
+
+LOAD DATA INFILE '/var/lib/mysql-files/stops.csv'
+INTO TABLE stops
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(@dummy_id, name, @dummy_lines, @is_transfer, @dummy_transfer_lines, x, y, @wheelchair, @shelter, @bench, @ticket, @display, @dummy_image_url)
+SET 
+    is_transfer = (@is_transfer = 'true'),
+    wheelchair_accessible = (@wheelchair = 'true'),
+    has_shelter = (@shelter = 'true'),
+    has_bench = (@bench = 'true'),
+    has_ticket_machine = (@ticket = 'true'),
+    has_display = (@display = 'true');
 
 INSERT IGNORE INTO team_name
 (name)
