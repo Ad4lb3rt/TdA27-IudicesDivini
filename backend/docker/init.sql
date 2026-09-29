@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS stops (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     image_url VARCHAR(255) GENERATED ALWAYS AS (
-        CONCAT('',
+        CONCAT('/images/',
             LOWER(SUBSTRING_INDEX(name, ' ', 1)),
             UPPER(LEFT(SUBSTRING_INDEX(name, ' ', -1), 1)),
             SUBSTRING(SUBSTRING_INDEX(name, ' ', -1),2), '.png'
