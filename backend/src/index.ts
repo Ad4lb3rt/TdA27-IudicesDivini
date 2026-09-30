@@ -36,7 +36,8 @@ const app = new Elysia({ prefix: "/api/v1" })
       const stop = await sql`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
       if (!stop) return status(404, { message: "Stop does not exist" });
       return stop[0];
-    }
+    },
+    { params: t.Object({ id: t.Numeric() }) },
   )
   .post(
     "/stops",
@@ -48,12 +49,13 @@ const app = new Elysia({ prefix: "/api/v1" })
     { body: StopBody },
   )
   .put(
-    "product/:id",
+    "/stops/:id",
     async ({ params: { id }, body, status }) => {
-      const [product] = await sql<Stop[]>`SELECT id FROM product WHERE id = ${id}`;
-      if (!product) return status(404, { message: "Product does not exist" });
+      const [product] = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
+      if (!product) return status(404, { message: "Stop does not exist" });
 
-      //await sql`UPDATE product SET name = ${body.name}, cost = ${body.cost} WHERE id = ${id}`;
+      await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url}, wheelchair_accessible = ${body.wheelchair_accessible},
+       has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
       return { id, ...body };
     },
     { params: t.Object({ id: t.Numeric() }), body: StopBody },
@@ -100,7 +102,8 @@ const app = new Elysia({ prefix: "/api/v1" })
         set.status = 404;
         return "Image not found";
       }
-    }
+    },
+    { params: t.Object({ name: t.String() }) },
   )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });
 
