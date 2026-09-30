@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import { SQL } from "bun";
 import { promises as fs } from "fs";
 
-type Product = { id: number; name: string; cost: number };
+type Stop = { id: number, name: string, image_url: string | null, wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean }
 
 // DATABASE_URL, e.g. mysql://tda_user:strongPassword%3F@127.0.0.1:3306/product
 // allowPublicKeyRetrieval: MySQL 8 password auth over plain TCP; safe because the DB is on the pod's localhost.
@@ -25,30 +25,38 @@ for (let attempt = 1; ; attempt++) {
   }
 }
 
-const ProductBody = t.Object({ name: t.String(), cost: t.Integer() });
+const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.String()), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1" })
   .use(cors())
-  .get("/product", () => sql<Product[]>`SELECT id, name, cost FROM product ORDER BY id`)
+  .get("/stops", async () => await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`)
+  .get("/stops/:id",
+    async ({ params: { id }, status }) => {
+      const stop = await sql`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
+      if (!stop) return status(404, { message: "Stop does not exist" });
+      return stop[0];
+    }
+  )
   .post(
-    "/product",
+    "/stops",
     async ({ body }) => {
-      const result = await sql`INSERT INTO product (name, cost) VALUES (${body.name}, ${body.cost})`;
+      const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine) 
+      VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
       return { id: Number(result.lastInsertRowid), ...body };
     },
-    { body: ProductBody },
+    { body: StopBody },
   )
   .put(
     "product/:id",
     async ({ params: { id }, body, status }) => {
-      const [product] = await sql<Product[]>`SELECT id FROM product WHERE id = ${id}`;
+      const [product] = await sql<Stop[]>`SELECT id FROM product WHERE id = ${id}`;
       if (!product) return status(404, { message: "Product does not exist" });
 
-      await sql`UPDATE product SET name = ${body.name}, cost = ${body.cost} WHERE id = ${id}`;
+      //await sql`UPDATE product SET name = ${body.name}, cost = ${body.cost} WHERE id = ${id}`;
       return { id, ...body };
     },
-    { params: t.Object({ id: t.Numeric() }), body: ProductBody },
+    { params: t.Object({ id: t.Numeric() }), body: StopBody },
   )
   .delete(
     "product/:id",
