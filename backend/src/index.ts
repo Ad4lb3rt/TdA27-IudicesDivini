@@ -41,10 +41,10 @@ const app = new Elysia({ prefix: "/api/v1" })
   )
   .post(
     "/stops",
-    async ({ body }) => {
+    async ({ body, status }) => {
       const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine) 
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
-      return { id: Number(result.lastInsertRowid), ...body };
+      return status(201, { id: Number(result.lastInsertRowid), ...body });
     },
     { body: StopBody },
   )
@@ -61,10 +61,10 @@ const app = new Elysia({ prefix: "/api/v1" })
     { params: t.Object({ id: t.Numeric() }), body: StopBody },
   )
   .delete(
-    "product/:id",
-    async ({ params: { id } }) => {
-      await sql`DELETE FROM product WHERE id = ${id}`;
-      return { message: "Product was deleted permanently from DB." };
+    "/stops/:id",
+    async ({ params: { id }, status }) => {
+      await sql`DELETE FROM stops WHERE id = ${id}`;
+      return status(204)
     },
     { params: t.Object({ id: t.Numeric() }) },
   )
