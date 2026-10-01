@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { type Product } from '$lib/api';
+	import { type Stop } from '$lib/api';
 	import ProductForm from "$lib/ProductForm.svelte";
 	import ProductTable from "$lib/ProductTable.svelte";
 
 	let { data }: { data: PageData } = $props();
 
-	let editingProduct = $state<Product | null>(null);
+	let editingProduct = $state<Stop | null>(null);
 
 	function handleSuccess() {
 		editingProduct = null;

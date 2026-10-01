@@ -2,10 +2,13 @@
 // localhost; in local compose (bridge network) BACKEND_URL points at the server service.
 const API_URL = process.env.BACKEND_URL ?? "http://localhost:8080/api/v1";
 
-export interface Product {
+export interface Stop {
   id?: number;
   name: string;
-  cost: number;
+  image_url: string | null;
+  wheelchair_accessible: boolean;
+  has_shelter: boolean;
+  has_ticket_machine: boolean;
 }
 
 export async function getHealth(customFetch = fetch): Promise<string> {
@@ -29,12 +32,12 @@ export async function getTeamMembers(customFetch = fetch): Promise<string[]> {
   return members;
 }
 
-export async function getProducts(customFetch = fetch): Promise<Product[]> {
+/* export async function getProducts(customFetch = fetch): Promise<Stop[]> {
   const res = await customFetch(`${API_URL}/product`);
   return res.json();
 }
 
-export async function createProduct(product: Omit<Product, 'id'>, customFetch = fetch): Promise<Product> {
+export async function createProduct(product: Omit<Stop, 'id'>, customFetch = fetch): Promise<Stop> {
   const res = await customFetch(`${API_URL}/product`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -43,7 +46,7 @@ export async function createProduct(product: Omit<Product, 'id'>, customFetch = 
   return res.json();
 }
 
-export async function updateProduct(id: number, product: Product, customFetch = fetch): Promise<Product> {
+export async function updateProduct(id: number, product: Stop, customFetch = fetch): Promise<Stop> {
   const res = await customFetch(`${API_URL}/product/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -61,4 +64,4 @@ export async function deleteProduct(id: number, customFetch = fetch): Promise<vo
     method: "DELETE",
   });
   return res.json();
-}
+} */

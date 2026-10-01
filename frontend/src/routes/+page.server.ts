@@ -1,21 +1,21 @@
 import * as api from '$lib/api';
 import type { PageServerLoad, Actions } from './$types';
-import { type Product } from "$lib/api";
+import { type Stop } from "$lib/api";
 
 export const load: PageServerLoad = async ({ fetch }) => {
-  const status: string = await api.getHealth(fetch);
-  const products: Product[] = await api.getProducts(fetch);
-  const teamName: string = await api.getTeamName(fetch);
-  const teamMembers: string[] = await api.getTeamMembers(fetch);
+	const status: string = await api.getHealth(fetch);
+	//const stops: Stop[] = await api.getProducts(fetch);
+	const teamName: string = await api.getTeamName(fetch);
+	const teamMembers: string[] = await api.getTeamMembers(fetch);
 	return {
-    products,
-    status,
-    teamName,
-    teamMembers
+		//stops,
+		status,
+		teamName,
+		teamMembers
 	};
 };
 
-export const actions: Actions = {
+/* export const actions: Actions = {
 	create: async ({ request, fetch }) => {
 		const data = await request.formData();
 		const name = data.get('name') as string;
@@ -46,4 +46,4 @@ export const actions: Actions = {
 		await api.deleteProduct(id, fetch);
 		return { success: true };
 	}
-};
+}; */

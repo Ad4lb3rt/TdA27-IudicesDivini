@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { Product } from './api';
+	import { enhance } from "$app/forms";
+	import type { Stop } from "./api";
 
 	interface Props {
-		initial?: Product | null;
+		initial?: Stop | null;
 		onCancel?: (() => void) | null;
 		onSuccess?: () => void;
 	}
@@ -30,8 +30,8 @@
 			<input name="name" value={initial?.name || ""} required />
 		</label>
 		<label>
-			Price
-			<input name="cost" type="number" value={initial?.cost || ""} required />
+			<!-- Price
+			<input name="cost" type="number" value={initial?.cost || ""} required /> -->
 		</label>
 		<button type="submit">{initial ? "Save" : "Add"}</button>
 		{#if onCancel}
