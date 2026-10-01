@@ -25,7 +25,7 @@ for (let attempt = 1; ; attempt++) {
   }
 }
 
-const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.String()), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
+const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.Nullable(t.String())), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1" })
