@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { Product } from './api';
+	import { enhance } from "$app/forms";
+	import type { Stop } from "./api";
 
 	interface Props {
-		products: Product[];
-		onEdit: (product: Product) => void;
+		products: Stop[];
+		onEdit: (product: Stop) => void;
 	}
 
-	let { products, onEdit }: Props = $props();
+	let { products: stops, onEdit }: Props = $props();
 </script>
 
-{#if products.length === 0}
+<!-- {#if stops.length === 0}
 	<p>No products.</p>
 {:else}
 	<table>
@@ -23,14 +23,19 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each products as p (p.id)}
+			{#each stops as p (p.id)}
 				<tr>
 					<td>{p.id}</td>
 					<td>{p.name}</td>
 					<td>{p.cost}</td>
 					<td class="actions">
 						<button onclick={() => onEdit(p)}>Edit</button>
-						<form method="POST" action="?/delete" use:enhance style="display: inline;">
+						<form
+							method="POST"
+							action="?/delete"
+							use:enhance
+							style="display: inline;"
+						>
 							<input type="hidden" name="id" value={p.id} />
 							<button type="submit">Delete</button>
 						</form>
@@ -40,3 +45,4 @@
 		</tbody>
 	</table>
 {/if}
+ -->

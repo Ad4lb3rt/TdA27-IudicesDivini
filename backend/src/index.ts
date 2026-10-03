@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import { SQL } from "bun";
 import { promises as fs } from "fs";
 
-type Product = { id: number; name: string; cost: number };
+type Stop = { id: number, name: string, image_url: string | null, wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean }
 
 // DATABASE_URL, e.g. mysql://tda_user:strongPassword%3F@127.0.0.1:3306/product
 // allowPublicKeyRetrieval: MySQL 8 password auth over plain TCP; safe because the DB is on the pod's localhost.
@@ -25,36 +25,46 @@ for (let attempt = 1; ; attempt++) {
   }
 }
 
-const ProductBody = t.Object({ name: t.String(), cost: t.Integer() });
+const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.Nullable(t.String())), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1" })
   .use(cors())
-  .get("/product", () => sql<Product[]>`SELECT id, name, cost FROM product ORDER BY id`)
-  .post(
-    "/product",
-    async ({ body }) => {
-      const result = await sql`INSERT INTO product (name, cost) VALUES (${body.name}, ${body.cost})`;
-      return { id: Number(result.lastInsertRowid), ...body };
+  .get("/stops", async () => await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`)
+  .get("/stops/:id",
+    async ({ params: { id }, status }) => {
+      const stop = await sql`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
+      if (!stop || stop.length === 0) return status(404, { message: "Stop does not exist" });
+      return stop[0];
     },
-    { body: ProductBody },
+    { params: t.Object({ id: t.Numeric() }) },
+  )
+  .post(
+    "/stops",
+    async ({ body, status }) => {
+      const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine)
+      VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
+      return status(201, { id: Number(result.lastInsertRowid), ...body });
+    },
+    { body: StopBody },
   )
   .put(
-    "product/:id",
+    "/stops/:id",
     async ({ params: { id }, body, status }) => {
-      const [product] = await sql<Product[]>`SELECT id FROM product WHERE id = ${id}`;
-      if (!product) return status(404, { message: "Product does not exist" });
+      const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
+      if (!existing || existing.length === 0) return status(404, { message: "Stop does not exist" });
 
-      await sql`UPDATE product SET name = ${body.name}, cost = ${body.cost} WHERE id = ${id}`;
+      await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url}, wheelchair_accessible = ${body.wheelchair_accessible},
+       has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
       return { id, ...body };
     },
-    { params: t.Object({ id: t.Numeric() }), body: ProductBody },
+    { params: t.Object({ id: t.Numeric() }), body: StopBody },
   )
   .delete(
-    "product/:id",
-    async ({ params: { id } }) => {
-      await sql`DELETE FROM product WHERE id = ${id}`;
-      return { message: "Product was deleted permanently from DB." };
+    "/stops/:id",
+    async ({ params: { id }, status }) => {
+      await sql`DELETE FROM stops WHERE id = ${id}`;
+      return status(204)
     },
     { params: t.Object({ id: t.Numeric() }) },
   )
@@ -92,7 +102,8 @@ const app = new Elysia({ prefix: "/api/v1" })
         set.status = 404;
         return "Image not found";
       }
-    }
+    },
+    { params: t.Object({ name: t.String() }) },
   )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });
 
