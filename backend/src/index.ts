@@ -25,21 +25,36 @@ for (let attempt = 1; ; attempt++) {
   }
 }
 
-const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.Nullable(t.String())), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
+const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
+const StopBodySchema = t.Object({
+  name: t.String({ maxLength: 255, minLength: 1 }),
+  image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))),
+  wheelchair_accessible: t.Boolean(),
+  has_shelter: t.Boolean(),
+  has_ticket_machine: t.Boolean()
+}, { additionalProperties: false });
+
+const IdParameterSchema = { id: t.Integer({ minimum: 1 }) }
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
-const app = new Elysia({ prefix: "/api/v1" })
+const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .use(cors())
+  .onError(({ code, error, set }) => {
+    if (code === 'VALIDATION') {
+      set.status = 400;
+      return { error: error.message }
+    }
+  })
   .get("/stops", async () => (await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`).map(stop =>
     ({ ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) }))
   )
   .get("/stops/:id",
     async ({ params: { id }, status }) => {
       const [stop] = await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
-      if (!stop) return status(404, { message: "Stop does not exist" });
+      if (!stop) return status(404, { error: "Stop does not exist" });
       return { ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ ...IdParameterSchema }) },
   )
   .post(
     "/stops",
@@ -48,27 +63,31 @@ const app = new Elysia({ prefix: "/api/v1" })
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
       return status(201, { id: Number(result.lastInsertRowid), ...body, image_url: body.image_url ?? null });
     },
-    { body: StopBody },
+    {
+      body: StopBodySchema
+    },
   )
   .put(
     "/stops/:id",
     async ({ params: { id }, body, status }) => {
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
-      if (!existing || existing.length === 0) return status(404, { message: "Stop does not exist" });
+      if (!existing || existing.length === 0) return status(404, { error: "Stop does not exist" });
 
       await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url ?? null}, wheelchair_accessible = ${body.wheelchair_accessible},
        has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
       return { id, ...body, image_url: body.image_url ?? null };
     },
-    { params: t.Object({ id: t.Numeric() }), body: StopBody },
+    { params: t.Object({ ...IdParameterSchema }), body: StopBodySchema },
   )
   .delete(
     "/stops/:id",
     async ({ params: { id }, status }) => {
+      const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
+      if (!existing || existing.length === 0) return status(404, { error: "Stop does not exist" });
       await sql`DELETE FROM stops WHERE id = ${id}`;
       return status(204)
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ ...IdParameterSchema }) },
   )
   .get("/health",
     () => ({
