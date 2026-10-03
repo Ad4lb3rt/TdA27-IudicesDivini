@@ -25,11 +25,18 @@ for (let attempt = 1; ; attempt++) {
   }
 }
 
-const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.Nullable(t.String())), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
+const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
+const StopBody = t.Object({ name: t.String({ maxLength: 255, minLength: 1 }), image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1" })
   .use(cors())
+  .onError(({ code, error, set }) => {
+    if (code === 'VALIDATION') {
+      set.status = 400;
+      return { error: error.message }
+    }
+  })
   .get("/stops", async () => (await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`).map(stop =>
     ({ ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) }))
   )
@@ -48,7 +55,9 @@ const app = new Elysia({ prefix: "/api/v1" })
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
       return status(201, { id: Number(result.lastInsertRowid), ...body, image_url: body.image_url ?? null });
     },
-    { body: StopBody },
+    {
+      body: StopBody
+    },
   )
   .put(
     "/stops/:id",
