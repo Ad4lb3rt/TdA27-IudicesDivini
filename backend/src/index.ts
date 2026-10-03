@@ -30,12 +30,14 @@ const StopBody = t.Object({ name: t.String(), image_url: t.Optional(t.Nullable(t
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1" })
   .use(cors())
-  .get("/stops", async () => await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`)
+  .get("/stops", async () => (await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`).map(stop =>
+    ({ ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) }))
+  )
   .get("/stops/:id",
     async ({ params: { id }, status }) => {
-      const stop = await sql`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
-      if (!stop || stop.length === 0) return status(404, { message: "Stop does not exist" });
-      return stop[0];
+      const [stop] = await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
+      if (!stop) return status(404, { message: "Stop does not exist" });
+      return { ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) };
     },
     { params: t.Object({ id: t.Numeric() }) },
   )
