@@ -26,10 +26,16 @@ for (let attempt = 1; ; attempt++) {
 }
 
 const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
-const StopBody = t.Object({ name: t.String({ maxLength: 255, minLength: 1 }), image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))), wheelchair_accessible: t.Boolean(), has_shelter: t.Boolean(), has_ticket_machine: t.Boolean() });
+const StopBody = t.Object({
+  name: t.String({ maxLength: 255, minLength: 1 }),
+  image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))),
+  wheelchair_accessible: t.Boolean(),
+  has_shelter: t.Boolean(),
+  has_ticket_machine: t.Boolean()
+}, { additionalProperties: false });
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
-const app = new Elysia({ prefix: "/api/v1" })
+const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .use(cors())
   .onError(({ code, error, set }) => {
     if (code === 'VALIDATION') {
