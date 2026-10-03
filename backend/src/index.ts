@@ -46,7 +46,7 @@ const app = new Elysia({ prefix: "/api/v1" })
     async ({ body, status }) => {
       const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine)
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
-      return status(201, { id: Number(result.lastInsertRowid), ...body });
+      return status(201, { id: Number(result.lastInsertRowid), ...body, image_url: body.image_url ?? null });
     },
     { body: StopBody },
   )
@@ -56,9 +56,9 @@ const app = new Elysia({ prefix: "/api/v1" })
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
       if (!existing || existing.length === 0) return status(404, { message: "Stop does not exist" });
 
-      await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url}, wheelchair_accessible = ${body.wheelchair_accessible},
+      await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url ?? null}, wheelchair_accessible = ${body.wheelchair_accessible},
        has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
-      return { id, ...body };
+      return { id, ...body, image_url: body.image_url ?? null };
     },
     { params: t.Object({ id: t.Numeric() }), body: StopBody },
   )
