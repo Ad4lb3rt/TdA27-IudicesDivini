@@ -7,8 +7,8 @@
 body {
   font-family: 'Geist Sans', system-ui, -apple-system, sans-serif;
   padding: 32px;
-  background: #111;
-  color: #ccc;
+  background: #fff;
+  color: #1A1A1A;
   min-height: 100vh;
   max-width: 720px;
   margin: 0 auto;
@@ -16,9 +16,13 @@ body {
   flex-direction: column;
 }
 
+img {
+    width: 200px;
+}
+
 h1 {
   margin-bottom: 24px;
-  color: #ccc;
+  color: #1A1A1A;
   font-weight: 600;
 }
 
@@ -35,7 +39,7 @@ th, td {
 }
 
 th {
-  color: #888;
+  color: #1A1A1A;
   font-weight: 500;
   font-size: 12px;
   text-transform: uppercase;
@@ -43,7 +47,7 @@ th {
 }
 
 tr:hover {
-  background: #191919;
+  background: #fff;
 }
 
 form {
@@ -58,15 +62,15 @@ label {
   flex-direction: column;
   gap: 4px;
   font-size: 13px;
-  color: #777;
+  color: #1A1A1A;
 }
 
 input {
   padding: 8px 10px;
   border: 1px solid #333;
   border-radius: 4px;
-  background: #1a1a1a;
-  color: #ccc;
+  background: #fff;
+  color: #1A1A1A;
   font-size: 14px;
 }
 
@@ -86,7 +90,7 @@ button {
 }
 
 button:hover {
-  background: #252525;
+  background: #fff;
   border-color: #444;
 }
 

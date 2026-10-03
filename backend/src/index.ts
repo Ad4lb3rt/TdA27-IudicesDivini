@@ -34,7 +34,7 @@ const app = new Elysia({ prefix: "/api/v1" })
   .get("/stops/:id",
     async ({ params: { id }, status }) => {
       const stop = await sql`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
-      if (!stop) return status(404, { message: "Stop does not exist" });
+      if (!stop || stop.length === 0) return status(404, { message: "Stop does not exist" });
       return stop[0];
     },
     { params: t.Object({ id: t.Numeric() }) },
@@ -42,7 +42,7 @@ const app = new Elysia({ prefix: "/api/v1" })
   .post(
     "/stops",
     async ({ body, status }) => {
-      const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine) 
+      const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine)
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
       return status(201, { id: Number(result.lastInsertRowid), ...body });
     },
@@ -51,8 +51,8 @@ const app = new Elysia({ prefix: "/api/v1" })
   .put(
     "/stops/:id",
     async ({ params: { id }, body, status }) => {
-      const [product] = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
-      if (!product) return status(404, { message: "Stop does not exist" });
+      const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
+      if (!existing || existing.length === 0) return status(404, { message: "Stop does not exist" });
 
       await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url}, wheelchair_accessible = ${body.wheelchair_accessible},
        has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
