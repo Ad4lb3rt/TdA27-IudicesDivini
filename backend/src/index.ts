@@ -83,9 +83,13 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
     { params: t.Object({ ...IdParameterSchema }) },
   )
   .get("/stops/search",
-    async ({ query }) => {
+    async ({ query, status }) => {
       if ('name' in query) {
-        return `Searching by name: ${query.name}`;
+        const searchNameLiteral = "%" + query.name + "%";
+        const resultStops = await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE
+        name LIKE ${searchNameLiteral}`;
+        if (!resultStops || resultStops.length === 0) return status(404, { error: "Stop not found" });
+        return resultStops;
       } else {
         const shelter = query.has_shelter === "true";
         const wheelchair = query.wheelchair_accessible === "true";
