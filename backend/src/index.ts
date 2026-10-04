@@ -75,7 +75,11 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   )
   .put(
     "/stops/:id",
-    async ({ params: { id }, body, status }) => {
+    async ({ params: { id }, body, status, request }) => {
+      const authHeaderData = request.headers.get('Authorization')
+      if (!authHeaderData || authHeaderData !== `Bearer ${API_KEY}`) {
+        return status(401, { error: "Stop not found" })
+      }
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
       if (!existing || existing.length === 0) return status(404, { error: "Stop not found" });
 
@@ -87,7 +91,11 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   )
   .delete(
     "/stops/:id",
-    async ({ params: { id }, status }) => {
+    async ({ params: { id }, status, request }) => {
+      const authHeaderData = request.headers.get('Authorization')
+      if (!authHeaderData || authHeaderData !== `Bearer ${API_KEY}`) {
+        return status(401, { error: "Stop not found" })
+      }
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
       if (!existing || existing.length === 0) return status(404, { error: "Stop not found" });
       await sql`DELETE FROM stops WHERE id = ${id}`;
