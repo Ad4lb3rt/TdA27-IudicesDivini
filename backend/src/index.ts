@@ -17,11 +17,15 @@ for (let attempt = 1; ; attempt++) {
     break;
   } catch (error) {
     if (attempt === maxAttemptsBeforeError) throw error;
-    console.log(`Waiting for database... (attempt ${attempt % maxAttemptsBeforeError}/${maxAttemptsBeforeError}`);
+    console.log(`Waiting for database... (attempt ${attempt % maxAttemptsBeforeError}/${maxAttemptsBeforeError})`);
     await Bun.sleep(1000);
   }
 }
 console.log("Successfully connected to database!")
+
+//!-----This code runs after the backend connects to db, so it is essential to write everything db related here
+
+const API_KEY = "Kyqc49jIM+5+D0Sed8ZQ671gxkd7W/bBTWjDtZ0Zrgk="
 
 const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
 const StopBodySchema = t.Object({
@@ -40,7 +44,7 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .onError(({ code, error, set }) => {
     if (code === 'VALIDATION') {
       set.status = 400;
-      return { error: error.message }
+      return { error: "Stop not found" }
     }
   })
   .get("/stops", async () => (await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops ORDER BY id`).map(stop =>
@@ -49,14 +53,18 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .get("/stops/:id",
     async ({ params: { id }, status }) => {
       const [stop] = await sql<Stop[]>`SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine FROM stops WHERE id = ${id}`;
-      if (!stop) return status(404, { error: "Stop does not exist" });
+      if (!stop) return status(404, { error: "Stop not found" });
       return { ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) };
     },
     { params: t.Object({ ...IdParameterSchema }) },
   )
   .post(
     "/stops",
-    async ({ body, status }) => {
+    async ({ body, status, request }) => {
+      const authHeaderData = request.headers.get('Authorization')
+      if (!authHeaderData || authHeaderData !== `Bearer ${API_KEY}`) {
+        return status(401, { error: "Stop not found" })
+      }
       const result = await sql`INSERT INTO stops (name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine)
       VALUES (${body.name}, ${body.image_url}, ${body.wheelchair_accessible}, ${body.has_shelter}, ${body.has_ticket_machine})`;
       return status(201, { id: Number(result.lastInsertRowid), ...body, image_url: body.image_url ?? null });
@@ -67,9 +75,13 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   )
   .put(
     "/stops/:id",
-    async ({ params: { id }, body, status }) => {
+    async ({ params: { id }, body, status, request }) => {
+      const authHeaderData = request.headers.get('Authorization')
+      if (!authHeaderData || authHeaderData !== `Bearer ${API_KEY}`) {
+        return status(401, { error: "Stop not found" })
+      }
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
-      if (!existing || existing.length === 0) return status(404, { error: "Stop does not exist" });
+      if (!existing || existing.length === 0) return status(404, { error: "Stop not found" });
 
       await sql`UPDATE stops SET name = ${body.name}, image_url = ${body.image_url ?? null}, wheelchair_accessible = ${body.wheelchair_accessible},
        has_shelter = ${body.has_shelter}, has_ticket_machine = ${body.has_ticket_machine} WHERE id = ${id}`;
@@ -79,9 +91,13 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   )
   .delete(
     "/stops/:id",
-    async ({ params: { id }, status }) => {
+    async ({ params: { id }, status, request }) => {
+      const authHeaderData = request.headers.get('Authorization')
+      if (!authHeaderData || authHeaderData !== `Bearer ${API_KEY}`) {
+        return status(401, { error: "Stop not found" })
+      }
       const existing = await sql<Stop[]>`SELECT id FROM stops WHERE id = ${id}`;
-      if (!existing || existing.length === 0) return status(404, { error: "Stop does not exist" });
+      if (!existing || existing.length === 0) return status(404, { error: "Stop not found" });
       await sql`DELETE FROM stops WHERE id = ${id}`;
       return status(204)
     },
