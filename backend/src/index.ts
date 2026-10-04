@@ -92,16 +92,16 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
         return resultStops;
       }
       else {
-        const has_shelter = query.has_shelter === "true" ? true : null;
         const wheelchair_accessible = query.wheelchair_accessible === "true" ? true : null;
+        const has_shelter = query.has_shelter === "true" ? true : null;
         const has_ticket_machine = query.has_ticket_machine === "true" ? true : null;
 
         const resultStops = await sql<Stop[]>`
           SELECT id, name, image_url, wheelchair_accessible, has_shelter, has_ticket_machine 
           FROM stops 
           WHERE 
-            (${has_shelter} IS NULL OR has_shelter = ${has_shelter}) AND
             (${wheelchair_accessible} IS NULL OR wheelchair_accessible = ${wheelchair_accessible}) AND
+            (${has_shelter} IS NULL OR has_shelter = ${has_shelter}) AND
             (${has_ticket_machine} IS NULL OR has_ticket_machine = ${has_ticket_machine})
         `;
         if (!resultStops || resultStops.length === 0) return status(404, { error: "Stop not found" });

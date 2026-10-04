@@ -63,6 +63,24 @@ export async function getStop(id: number, customFetch = fetch): Promise<Stop> {
   return res.json();
 }
 
+export async function getStopByName(name: string, customFetch = fetch): Promise<Stop[]> {
+  const res = await customFetch(`${API_URL}/stops/search?name=${name}`)
+  if (res.status === 404) {
+    const err = await res.json();
+    throw new Error(err.message);
+  }
+  return res.json();
+}
+
+export async function getStopByProperty(wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean, customFetch = fetch): Promise<Stop[]> {
+  const res = await customFetch(`${API_URL}/stops/search?wheelchair_accessible=${wheelchair_accessible}&has_shelter=${has_shelter}&has_ticket_machine=${has_ticket_machine}`)
+  if (res.status === 404) {
+    const err = await res.json();
+    throw new Error(err.message);
+  }
+  return res.json();
+}
+
 export async function createStop(stop: Omit<Stop, 'id'>, customFetch = fetch): Promise<Stop> {
   const res = await customFetch(`${API_URL}/stops`, {
     method: "POST",
