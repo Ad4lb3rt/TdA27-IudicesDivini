@@ -41,7 +41,7 @@ const IdParameterSchema = { id: t.Integer({ minimum: 1 }) }
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .use(cors())
-  .onError(({ code, error, set }) => {
+  .onError(({ code, set }) => {
     if (code === 'VALIDATION') {
       set.status = 400;
       return { error: "Stop not found" }

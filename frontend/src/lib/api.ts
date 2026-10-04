@@ -17,6 +17,8 @@ const API_URL = browser ? "/api/v1" : SERVER_API_URL;
 // Always same-origin so it works through Caddy in every environment.
 const PUBLIC_API_URL = "/api/v1";
 
+const API_KEY = "Kyqc49jIM+5+D0Sed8ZQ671gxkd7W/bBTWjDtZ0Zrgk="
+
 export interface Stop {
   id?: number;
   name: string;
@@ -64,7 +66,7 @@ export async function getStop(id: number, customFetch = fetch): Promise<Stop> {
 export async function createStop(stop: Omit<Stop, 'id'>, customFetch = fetch): Promise<Stop> {
   const res = await customFetch(`${API_URL}/stops`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
     body: JSON.stringify(stop),
   });
   return res.json();
@@ -73,7 +75,7 @@ export async function createStop(stop: Omit<Stop, 'id'>, customFetch = fetch): P
 export async function updateStop(id: number, stop: Stop, customFetch = fetch): Promise<Stop> {
   const res = await customFetch(`${API_URL}/stops/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
     body: JSON.stringify(stop),
   });
   if (res.status === 404) {
@@ -86,6 +88,7 @@ export async function updateStop(id: number, stop: Stop, customFetch = fetch): P
 export async function deleteStop(id: number, customFetch = fetch): Promise<void> {
   const res = await customFetch(`${API_URL}/stops/${id}`, {
     method: "DELETE",
+    headers: { "Authorization": `Bearer ${API_KEY}` }
   });
   return res.json();
 }
