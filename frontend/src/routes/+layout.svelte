@@ -16,7 +16,7 @@
         </div>
     </nav>
 
-	<main>
+	<main class="page-content">
 		{@render children()}
 	</main>
 
