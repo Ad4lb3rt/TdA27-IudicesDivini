@@ -29,12 +29,36 @@ const API_KEY = "Kyqc49jIM+5+D0Sed8ZQ671gxkd7W/bBTWjDtZ0Zrgk="
 
 const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
 const StopBodySchema = t.Object({
-  name: t.String({ maxLength: 255, minLength: 1 }),
+  name: t.String({ minLength: 1, maxLength: 255 }),
   image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))),
   wheelchair_accessible: t.Boolean(),
   has_shelter: t.Boolean(),
   has_ticket_machine: t.Boolean()
 }, { additionalProperties: false });
+
+const BooleanString = t.Optional(t.Union([t.Literal("true"), t.Literal("false")]));
+
+const StopSearchQuerySchema = t.Union([
+  // Either require a name
+  t.Object(
+    {
+      name: t.String({ minLength: 1, maxLength: 255 }),
+    },
+    { additionalProperties: false }
+  ),
+  // Or require at least one boolean-like string parameter
+  t.Object(
+    {
+      wheelchair_accessible: BooleanString,
+      has_shelter: BooleanString,
+      has_ticket_machine: BooleanString,
+    },
+    {
+      additionalProperties: false,
+      minProperties: 1
+    }
+  ),
+]);
 
 const IdParameterSchema = { id: t.Integer({ minimum: 1 }) }
 
@@ -57,6 +81,22 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
       return { ...stop, wheelchair_accessible: Boolean(stop.wheelchair_accessible), has_shelter: Boolean(stop.has_shelter), has_ticket_machine: Boolean(stop.has_ticket_machine) };
     },
     { params: t.Object({ ...IdParameterSchema }) },
+  )
+  .get("/stops/search",
+    async ({ query }) => {
+      if ('name' in query) {
+        return `Searching by name: ${query.name}`;
+      } else {
+        const shelter = query.has_shelter === "true";
+        const wheelchair = query.wheelchair_accessible === "true";
+        const machine = query.has_ticket_machine === "true";
+
+        return `Searching by features: shelter=${shelter}, wheelchair=${wheelchair}, machine=${machine}`;
+      }
+    },
+    {
+      query: StopSearchQuerySchema
+    }
   )
   .post(
     "/stops",
