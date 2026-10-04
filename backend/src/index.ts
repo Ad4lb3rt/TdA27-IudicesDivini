@@ -16,7 +16,7 @@ for (let attempt = 1; ; attempt++) {
     await sql`SELECT 1`;
     break;
   } catch (error) {
-    if (maxAttemptsBeforeError === 60) throw error;
+    if (attempt === maxAttemptsBeforeError) throw error;
     console.log(`Waiting for database... (attempt ${attempt % maxAttemptsBeforeError}/${maxAttemptsBeforeError}`);
     await Bun.sleep(1000);
   }
