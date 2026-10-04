@@ -10,20 +10,18 @@ type Stop = { id: number, name: string, image_url: string | null, wheelchair_acc
 const sql = new SQL(process.env.DATABASE_URL!, { allowPublicKeyRetrieval: true });
 
 // The database may still be starting up (no startup order on Tour de Cloud), so retry.
+const maxAttemptsBeforeError = 60;
 for (let attempt = 1; ; attempt++) {
   try {
-    await sql`CREATE TABLE IF NOT EXISTS product (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      cost INT NOT NULL
-      )`;
+    await sql`SELECT 1`;
     break;
   } catch (error) {
-    if (attempt === 60) throw error;
-    console.log("Waiting for database...");
+    if (maxAttemptsBeforeError === 60) throw error;
+    console.log(`Waiting for database... (attempt ${attempt % maxAttemptsBeforeError}/${maxAttemptsBeforeError}`);
     await Bun.sleep(1000);
   }
 }
+console.log("Successfully connected to database!")
 
 const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
 const StopBodySchema = t.Object({
