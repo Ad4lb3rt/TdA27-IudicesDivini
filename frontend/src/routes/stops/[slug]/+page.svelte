@@ -6,7 +6,7 @@
 </script>
 
 <div>
-	<a href="/stops">← Back to stops</a>
+	<a href="/stops">Back to stops</a>
 	<h1>{data.stop.name}</h1>
 	{#if data.stop.image_url}
 		<img src={resolveImageUrl(data.stop.image_url)} alt={data.stop.name} />

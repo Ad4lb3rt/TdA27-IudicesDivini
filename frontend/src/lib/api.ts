@@ -51,7 +51,9 @@ export async function getTeamMembers(customFetch = fetch): Promise<string[]> {
 
 export async function getStops(customFetch = fetch): Promise<Stop[]> {
   const res = await customFetch(`${API_URL}/stops`);
-  return res.json();
+  if (!res.ok) throw new Error(`Failed to load stops (${res.status})`);
+  const stops: Stop[] = await res.json();
+  return stops.map(normalizeStop);
 }
 
 export async function getStop(id: number, customFetch = fetch): Promise<Stop> {
@@ -60,25 +62,48 @@ export async function getStop(id: number, customFetch = fetch): Promise<Stop> {
     const err = await res.json();
     throw new Error(err.message);
   }
-  return res.json();
+  if (!res.ok) throw new Error(`Failed to load stop (${res.status})`);
+  return normalizeStop(await res.json());
 }
 
 export async function getStopByName(name: string, customFetch = fetch): Promise<Stop[]> {
-  const res = await customFetch(`${API_URL}/stops/search?name=${name}`)
-  if (res.status === 404) {
-    const err = await res.json();
-    throw new Error(err.message);
-  }
-  return res.json();
+  const res = await customFetch(`${API_URL}/stops/search?name=${encodeURIComponent(name)}`)
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`Search failed (${res.status})`);
+  const stops: Stop[] = await res.json();
+  return stops.map(normalizeStop);
+}
+
+export interface StopFilters {
+  wheelchair_accessible?: boolean;
+  has_shelter?: boolean;
+  has_ticket_machine?: boolean;
 }
 
 export async function getStopByProperty(wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean, customFetch = fetch): Promise<Stop[]> {
-  const res = await customFetch(`${API_URL}/stops/search?wheelchair_accessible=${wheelchair_accessible}&has_shelter=${has_shelter}&has_ticket_machine=${has_ticket_machine}`)
-  if (res.status === 404) {
-    const err = await res.json();
-    throw new Error(err.message);
-  }
-  return res.json();
+  return searchStopsByFilters({ wheelchair_accessible, has_shelter, has_ticket_machine }, customFetch);
+}
+
+export async function searchStopsByFilters(filters: StopFilters, customFetch = fetch): Promise<Stop[]> {
+  const params = new URLSearchParams();
+  if (filters.wheelchair_accessible) params.set("wheelchair_accessible", "true");
+  if (filters.has_shelter) params.set("has_shelter", "true");
+  if (filters.has_ticket_machine) params.set("has_ticket_machine", "true");
+  if ([...params].length === 0) return getStops(customFetch);
+  const res = await customFetch(`${API_URL}/stops/search?${params.toString()}`)
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`Search failed (${res.status})`);
+  const stops: Stop[] = await res.json();
+  return stops.map(normalizeStop);
+}
+
+function normalizeStop(stop: Stop): Stop {
+  return {
+    ...stop,
+    wheelchair_accessible: Boolean(stop.wheelchair_accessible),
+    has_shelter: Boolean(stop.has_shelter),
+    has_ticket_machine: Boolean(stop.has_ticket_machine)
+  };
 }
 
 export async function createStop(stop: Omit<Stop, 'id'>, customFetch = fetch): Promise<Stop> {
