@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 import { SQL } from "bun";
 import { promises as fs } from "fs";
+import { error } from "console";
 
 type Stop = { id: number, name: string, image_url: string | null, wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean }
 
@@ -27,7 +28,7 @@ console.log("Successfully connected to database!")
 
 const API_KEY = "Kyqc49jIM+5+D0Sed8ZQ671gxkd7W/bBTWjDtZ0Zrgk="
 
-const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).toString();
+const urlPattern = (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g).source;
 const StopBodySchema = t.Object({
   name: t.String({ minLength: 1, maxLength: 255 }),
   image_url: t.Optional(t.Nullable(t.String({ maxLength: 255, pattern: urlPattern }))),
@@ -60,14 +61,15 @@ const StopSearchQuerySchema = t.Union([
   ),
 ]);
 
-const IdParameterSchema = { id: t.Integer({ minimum: 1 }) }
+const IdParameterSchema = { id: t.Numeric({ minimum: 1, multipleOf: 1 }) }
 
 // Allow a frontend dev server on another port (e.g. localhost:3001) to call the API.
 const app = new Elysia({ prefix: "/api/v1", normalize: false })
   .use(cors())
-  .onError(({ code, set }) => {
+  .onError(({ code, set, error }) => {
     if (code === 'VALIDATION') {
       set.status = 400;
+      console.log(error)
       return { error: "Stop not found" }
     }
   })
