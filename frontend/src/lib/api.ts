@@ -138,7 +138,12 @@ export async function deleteStop(id: number, customFetch = fetch): Promise<void>
 
 export function resolveImageUrl(image_url: string | null): string | null {
   if (!image_url) return null;
-  if (/^https?:\/\//.test(image_url)) return image_url;
+
+  // Route external URLs through Webp Proxy
+  if (/^https?:\/\//.test(image_url)) {
+    return `${PUBLIC_API_URL}/image-proxy?url=${encodeURIComponent(image_url)}`;
+  }
+
   const path = image_url.startsWith("/") ? image_url : `/${image_url}`;
   return `${PUBLIC_API_URL}${path}`;
 }

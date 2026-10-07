@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { onDestroy } from 'svelte';
-	import type { PageData } from './$types';
-	import { resolveImageUrl } from '$lib/api';
+	import { goto } from "$app/navigation";
+	import { onDestroy } from "svelte";
+	import type { PageData } from "./$types";
+	import { resolveImageUrl } from "$lib/api";
 
 	let { data }: { data: PageData } = $props();
 
@@ -112,13 +112,43 @@
 <div class="stops">
 	<h1>Stops</h1>
 	<div class="search-row">
-	    <div class="search-bar">
-			<input type="text" maxlength="255" placeholder="Search..." bind:value={inputValue} oninput={onSearchInput} />
+		<div class="search-bar">
+			<input
+				type="text"
+				maxlength="255"
+				placeholder="Search..."
+				bind:value={inputValue}
+				oninput={onSearchInput}
+			/>
 		</div>
 		<div class="filters">
-		    <button type="button" aria-pressed={wheelchairChecked} style="background-color: {wheelchairChecked ? "#91F5AD" : "#F5F5F5"}; --checked: {wheelchairChecked}" class="filter" onclick={onWheelchairClick}>Wheelchair accessible</button>
-			<button type="button" aria-pressed={shelterChecked} style="background-color: {shelterChecked ? "#91F5AD" : "#F5F5F5"}; --checked: {shelterChecked}" class="filter" onclick={onShelterClick}>Has shelter</button>
-			<button type="button" aria-pressed={ticketMachineChecked} style="background-color: {ticketMachineChecked ? "#91F5AD" : "#F5F5F5"}; --checked: {ticketMachineChecked}" class="filter" onclick={onTicketMachineClick}>Has ticket machine</button>
+			<button
+				type="button"
+				aria-pressed={wheelchairChecked}
+				style="background-color: {wheelchairChecked
+					? '#91F5AD'
+					: '#F5F5F5'}; --checked: {wheelchairChecked}"
+				class="filter"
+				onclick={onWheelchairClick}>Wheelchair accessible</button
+			>
+			<button
+				type="button"
+				aria-pressed={shelterChecked}
+				style="background-color: {shelterChecked
+					? '#91F5AD'
+					: '#F5F5F5'}; --checked: {shelterChecked}"
+				class="filter"
+				onclick={onShelterClick}>Has shelter</button
+			>
+			<button
+				type="button"
+				aria-pressed={ticketMachineChecked}
+				style="background-color: {ticketMachineChecked
+					? '#91F5AD'
+					: '#F5F5F5'}; --checked: {ticketMachineChecked}"
+				class="filter"
+				onclick={onTicketMachineClick}>Has ticket machine</button
+			>
 		</div>
 	</div>
 

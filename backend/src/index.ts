@@ -2,7 +2,8 @@ import { cors } from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 import { SQL } from "bun";
 import { promises as fs } from "fs";
-import { error } from "console";
+import sharp from "sharp";
+import { LRUCache } from 'lru-cache';
 
 type Stop = { id: number, name: string, image_url: string | null, wheelchair_accessible: boolean, has_shelter: boolean, has_ticket_machine: boolean }
 
@@ -25,6 +26,10 @@ for (let attempt = 1; ; attempt++) {
 console.log("Successfully connected to database!")
 
 //!-----This code runs after the backend connects to db, so it is essential to write everything db related here
+
+const webpCache = new LRUCache({
+  max: 5000,
+});
 
 const API_KEY = "Kyqc49jIM+5+D0Sed8ZQ671gxkd7W/bBTWjDtZ0Zrgk="
 
@@ -183,18 +188,70 @@ const app = new Elysia({ prefix: "/api/v1", normalize: false })
   )
   .get("/images/:name",
     async ({ params: { name }, set }) => {
+      const cacheKey = `local:${name}`;
+
+      if (webpCache.has(cacheKey)) {
+        set.headers["Content-Type"] = "image/webp";
+        set.headers["Cache-Control"] = "public, max-age=86400";
+        return webpCache.get(cacheKey);
+      }
+
       try {
-        const image = await fs.readFile(`./src/images/stops/${name}.png`);
-        set.headers["Content-Type"] = "image/png";
-        return image;
+        const imageBuffer = await fs.readFile(`./src/images/stops/${name}.png`);
+
+        const webpBuffer = await sharp(imageBuffer).webp({ quality: 90 }).toBuffer();
+
+        webpCache.set(cacheKey, webpBuffer);
+
+        set.headers["Content-Type"] = "image/webp";
+        set.headers["Cache-Control"] = "public, max-age=86400";
+        return webpBuffer;
       }
       catch (err) {
         console.error(err);
         set.status = 404;
-        return "Image not found";
+        return { error: "Image not found" };
       }
     },
     { params: t.Object({ name: t.String() }) },
+  )
+  .get("/image-proxy",
+    async ({ query: { url }, set }) => {
+
+      //If we have already converted this url, just returned the cached webp
+      if (webpCache.has(url)) {
+        set.headers['content-type'] = "image/webp";
+        set.headers['cache-control'] = "public, max-age=86400"
+        return webpCache.get(url);
+      }
+
+      //Otherwise we craft the webp out of the image and save it to our LRU cache
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          set.status = 502;
+          return { error: "Failed to fetch the image!" }
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const webpBuffer = await sharp(arrayBuffer).webp({ quality: 90 }).toBuffer();
+
+        webpCache.set(url, webpBuffer);
+
+        set.headers["Content-Type"] = "image/webp";
+        set.headers["Cache-Control"] = "public, max-age=86400";
+        return webpBuffer;
+      }
+      catch (err) {
+        set.status = 500;
+        return { error: "Image processing failed" };
+      }
+    },
+    {
+      query: t.Object({
+        url: t.String({ format: "uri" })
+      })
+    }
   )
   .listen({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 8080) });
 
