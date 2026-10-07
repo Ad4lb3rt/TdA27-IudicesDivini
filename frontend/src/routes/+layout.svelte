@@ -21,6 +21,6 @@
 	</main>
 
 	<footer>
-		<p>Built with ❤️ by {data.teamName} - {data.teamMembers[0]}, {data.teamMembers[1]}, {data.teamMembers[2]}</p>
+		<p>Built with ❤️ by <p2 class="team-name">{data.teamName}</p2> - {data.teamMembers[0]}, {data.teamMembers[1]}, {data.teamMembers[2]}</p>
 	</footer>
 </div>

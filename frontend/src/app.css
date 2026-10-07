@@ -146,8 +146,13 @@ p {
 footer {
     margin-top: auto;
     display: flex;
+    margin: 32px 0px 32px 0px;
     justify-content: center;
     text-align: center;
+}
+
+.team-name {
+    color: #963C64;
 }
 
 .stops-list {
@@ -256,4 +261,58 @@ footer {
 .filter:hover {
     border: 2px solid #E1E1E1;
     transition: 200ms;
+}
+
+.stop-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.stop-back {
+    margin-bottom: 16px;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.stop-back:hover {
+    color: #1a1aff;
+}
+
+.stop-detail-name {
+    margin-bottom: 16px;
+}
+
+.stop-detail-card {
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #F5F5F5;
+    border: 2px solid #F5F5F5;
+    padding: 10px;
+}
+
+.stop-detail-image {
+    width: 50%;
+    max-width: 400px;
+    height: auto;
+    min-height: 280px;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.stop-detail-info {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 16px 16px 16px;
+    font-size: 18px;
+    color: #1A1A1A;
 }
