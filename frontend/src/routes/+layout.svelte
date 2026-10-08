@@ -8,7 +8,7 @@
 <div class="page">
     <nav class="navbar">
         <a href="/" class="logo">
-            <img src="logo_black.svg" alt="Logo">
+            <img src="/logo_black.svg" alt="Logo">
         </a>
         <div class="navbar-links">
             <a href="/">Home</a>
