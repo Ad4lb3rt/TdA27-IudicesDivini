@@ -153,7 +153,9 @@
 	</div>
 
 	{#if data.stops.length === 0}
-		<p>No stops found.</p>
+	<div class="error-container">
+	    <p class="error-message">No stops found.</p>
+	</div>
 	{:else}
 		<ul class="stops-list">
 			{#each data.stops as stop (stop.id)}

@@ -316,3 +316,14 @@ footer {
     font-size: 18px;
     color: #1A1A1A;
 }
+
+.error-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+}
+
+.error-message {
+    font-size: 48px;
+}
